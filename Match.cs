@@ -118,6 +118,20 @@ public partial class Match : Form
                         needReconnect = false;
                         MatchWsClient.Close();
                     }
+                    else if (e.ToText() == "RacePlayerNotFound")
+                    {
+                        MessageBox.Show("该轮次未导入此米米号");
+                        this.Visible = false;
+                        needReconnect = false;
+                        MatchWsClient.Close();
+                    }
+                    else if (e.ToText() == "RacePlayerMaxCount")
+                    {
+                        MessageBox.Show("该轮次此米米号已经达到最大场次");
+                        this.Visible = false;
+                        needReconnect = false;
+                        MatchWsClient.Close();
+                    }
                     else
                     {
                         _forwardWsMess(e.ToText());
