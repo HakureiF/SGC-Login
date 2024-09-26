@@ -33,9 +33,13 @@ public class Constant
         {
             targetHost = "www.imrightchen.live";
         }
-        if (url.Contains("hakureif"))
+        if (url.Contains("www.hakureif"))
         {
             targetHost = "www.hakureif.site";
+        }
+        if (url.Contains("ww2.hakureif"))
+        {
+            targetHost = "ww2.hakureif.site";
         }
         return new TouchSocketConfig().SetRemoteIPHost(url).SetClientSslOption(new ClientSslOption()
         {

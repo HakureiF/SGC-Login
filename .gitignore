@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 *.dll
+
+Utils/AesUtil.cs

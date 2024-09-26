@@ -51,7 +51,6 @@ public static class LoginerApi
     
     public static async Task GetAnnouncement()
     {
-        Debug.WriteLine("test");
         HttpClient httpClient = new();
         var res = await httpClient.GetAsync($"http{Constant.Host}/api/announcement/getLoginerAnnouncement");
         if (!res.IsSuccessStatusCode) throw new RequestException("请求失败");
@@ -64,7 +63,10 @@ public static class LoginerApi
                 var announcement = resUtil.GetValueOrDefault("data").Deserialize<Dictionary<string, string>>();
                 if (announcement != null && announcement.ContainsKey("announcement"))
                 {
-                    MessageBox.Show(announcement["announcement"], "公告");
+                    //MessageBox.Show(announcement["announcement"], "公告");
+                    var anncounceBox = new Announce();
+                    anncounceBox.InitializeAnnounce(announcement["announcement"]);
+                    anncounceBox.Show();
                 }
                 if (announcement != null && announcement.ContainsKey("version"))
                 {
