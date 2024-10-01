@@ -29,7 +29,8 @@ public sealed partial class Main : Form
     public Main()
     {
         InitializeComponent();
-        Text = @"SGC比赛登录器 当前版本" + Constant._version + "    ！！！本登录器仅在QQ群787839277，876757129内流通，请勿使用他人转发提供的登录器，以防盗号风险！！！";
+        //Text = @"SGC比赛登录器 当前版本" + Constant._version + "    ！！！本登录器仅在QQ群787839277，876757129内流通，请勿使用他人转发提供的登录器，以防盗号风险！！！";
+        Text = @"SGC比赛登录器（Beta版本仅由 @HakureiF 发布，若看到他人发布请勿使用）";
         Resize += Form_Resize;
         LocationChanged += Location_Change;
         InitializeAsync();
@@ -48,12 +49,8 @@ public sealed partial class Main : Form
         //PetUtil.InitPetsData();
         //await SeerApi.SetHeadJsons();
         await LoginerApi.GetAnnouncement();
+        await webView.EnsureCoreWebView2Async(null);
 
-
-        Thread.Sleep(300);
-        webView.CoreWebView2.WebMessageReceived += GetMessage;
-        await webView.CoreWebView2.ExecuteScriptAsync(JsScript.WebViewListener);
-        await webView.CoreWebView2.ExecuteScriptAsync(JsScript.LoginListener);
     }
 
     private void CloseAll(object? sender, FormClosedEventArgs e)
@@ -64,7 +61,7 @@ public sealed partial class Main : Form
     // 确保你已经初始化了WebView2控件并可以访问到CoreWebView2对象
 
     // 在 CoreWebView2 初始化完成事件处理程序中订阅 WebResourceRequested 事件
-    private void WebView_CoreWebViewInitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+    private async void WebView_CoreWebViewInitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
     {
         // 确保CoreWebView2已成功初始化
         if (!e.IsSuccess) return;
@@ -74,8 +71,12 @@ public sealed partial class Main : Form
         //webView.CoreWebView2.AddWebResourceRequestedFilter("**", CoreWebView2WebResourceContext.All);
         //webView.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
         //webView.CoreWebView2.WebResourceResponseReceived +=
+        await webView.CoreWebView2.ExecuteScriptAsync(JsScript.LoginListener);
+        await webView.CoreWebView2.ExecuteScriptAsync(JsScript.WebViewListener + JsScript.LoginListener);
+        
 
         webView.CoreWebView2.IsMuted = true;
+        webView.CoreWebView2.WebMessageReceived += GetMessage;
     }
 
     private static void CoreWebView2_WebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
@@ -274,7 +275,7 @@ public sealed partial class Main : Form
     { // 发送Ws消息中转
         if (Dialog.MyWsClient.Online)
         {
-            Dialog.MyWsClient.SendWithWS(mess);
+            Dialog.MyWsClient.SendAsync(mess);
         }
         if (Match.MatchWsClient.Online)
         {

@@ -167,7 +167,7 @@ namespace Seer
                 Match.needReconnect = false;
                 Match.MatchWsClient.Close();
                 Match.MatchWsClient.Dispose();
-                MessageBox.Show("有一方退出或掉线");
+                MessageBox.Show("有一方退出或掉线", "掉线", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                 this.Close();
                 this.Dispose();
             }

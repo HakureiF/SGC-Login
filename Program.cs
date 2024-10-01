@@ -12,7 +12,7 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        LoadDll.RegistDLL();
+        //LoadDll.RegistDLL();
         CreateFileIfNotExists("store.json");
         var store = StoreUtil.getStore();
         if (store != null)

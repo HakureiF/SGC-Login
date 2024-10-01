@@ -291,7 +291,9 @@ public partial class Match : Form
         string? bagmess = await ConventionalGameApi.VerifyBag2(param);
         if (bagmess != null)
         {
-            MessageBox.Show(bagmess);
+            MessageBox.Show(bagmess, "校验错误", MessageBoxButtons.OK, 
+                MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 
+                MessageBoxOptions.ServiceNotification);
             this.Visible = false;
             needReconnect = false;
             MatchWsClient.Close();
