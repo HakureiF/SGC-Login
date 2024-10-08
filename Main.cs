@@ -29,8 +29,8 @@ public sealed partial class Main : Form
     public Main()
     {
         InitializeComponent();
-        //Text = @"SGC比赛登录器 当前版本" + Constant._version + "    ！！！本登录器仅在QQ群787839277，876757129内流通，请勿使用他人转发提供的登录器，以防盗号风险！！！";
-        Text = @"SGC比赛登录器（Beta版本仅由 @HakureiF 发布，若看到他人发布请勿使用）";
+        Text = @"SGC比赛登录器 当前版本" + Constant._version + "    ！！！本登录器仅在QQ群787839277，876757129内流通，请勿使用他人转发提供的登录器，以防盗号风险！！！";
+        //Text = @"SGC比赛登录器（Beta版本仅由 @HakureiF 发布，若看到他人发布请勿使用）";
         Resize += Form_Resize;
         LocationChanged += Location_Change;
         InitializeAsync();

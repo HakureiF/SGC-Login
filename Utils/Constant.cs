@@ -13,7 +13,7 @@ public class Constant
     //public static string MatchHost = "://localhost:8080";
     public static string MatchHost = "s://www.hakureif.site:8080";
 
-    public static string _version = "1.1.5";
+    public static string _version = "1.1.6";
 
     
 

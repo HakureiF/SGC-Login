@@ -17,16 +17,16 @@ namespace Seer.Utils
 
         public static void InitPetsData()
         {
-            //string fileName = "pets_jsondata.json";
-            //if (File.Exists(Application.StartupPath + fileName))
-            //{
-            //    FileStream fsr = new FileStream(Application.StartupPath + fileName, FileMode.Open, FileAccess.Read);
-            //    StreamReader sr = new StreamReader(fsr);
-            //    petsData = JsonSerializer.Deserialize<Dictionary<int, string>>(sr.ReadToEnd());
+            string fileName = "pets_jsondata.json";
+            if (File.Exists(Application.StartupPath + fileName))
+            {
+                FileStream fsr = new FileStream(Application.StartupPath + fileName, FileMode.Open, FileAccess.Read);
+                StreamReader sr = new StreamReader(fsr);
+                petsData = JsonSerializer.Deserialize<Dictionary<int, string>>(sr.ReadToEnd());
 
-            //    fsr.Close();
-            //    sr.Close();
-            //}
+                fsr.Close();
+                sr.Close();
+            }
 
             string fileName2 = "special_petheads.json";
             if (File.Exists(Application.StartupPath + fileName2))
