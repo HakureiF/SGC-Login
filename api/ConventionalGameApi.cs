@@ -40,6 +40,20 @@ public static class ConventionalGameApi
         return groups;
     }
 
+    public static async Task<List<RaceGroup>?> SearchGroups()
+    {
+        HttpClient httpClient = new();
+
+        var res1 = await httpClient.GetAsync($"http{Constant.MatchHost}/api/race-group/searchGroup?group=match");
+        if (!res1.IsSuccessStatusCode) { httpClient.Dispose(); throw new Exception("链接失败"); }
+        var responseBody = await res1.Content.ReadAsStringAsync();
+        httpClient.Dispose();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody) ?? throw new Exception("链接失败");
+        if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) return null;
+        var groups = resUtil.GetValueOrDefault("data").Deserialize<List<RaceGroup>>();
+        return groups;
+    }
+
 
 
     public static async Task<Dictionary<string, string>?> GenerateGame(string groupId)

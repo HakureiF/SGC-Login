@@ -1,4 +1,5 @@
 ﻿using Seer.api;
+using Seer.handler;
 using Seer.Utils;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,14 @@ namespace Seer
             {
                 _emitFromSubForms(3);
                 Close();
+            }
+        }
+
+        private void CloseJoin(object? sender, FormClosedEventArgs e)
+        {
+            if (SgcWsHandler._modMark.Equals("Join"))
+            {
+                SgcWsHandler.CloseConnect();
             }
         }
     }

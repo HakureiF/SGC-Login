@@ -72,6 +72,7 @@
             Controls.Add(gameIdLabel);
             Name = "JoinConventionalGame";
             Text = "加入对战";
+            FormClosed += CloseJoin;
             ResumeLayout(false);
             PerformLayout();
         }

@@ -74,6 +74,7 @@
             Controls.Add(label);
             Name = "GenerateConventionalGame";
             Text = "新建对战";
+            FormClosed += CloseGenerate;
             ResumeLayout(false);
             PerformLayout();
         }

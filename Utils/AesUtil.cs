@@ -5,7 +5,7 @@ namespace Seer.Utils;
 
 public static class AesUtil
 {
-    private const string Key = "test";
+    private const string Key = "XJWr6ScnBOwU9kJY";
 
     /// <summary>
     /// AES加密

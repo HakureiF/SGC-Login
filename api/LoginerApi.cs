@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Security.Policy;
 using System.Text.Json;
+using Microsoft.VisualBasic.ApplicationServices;
 using Seer.CustomException;
 using Seer.Utils;
 using TouchSocket.Core;
@@ -48,7 +49,109 @@ public static class LoginerApi
         httpClient.Dispose();
         return false;
     }
+
+
+    public static async Task<bool> VerifyPass(Dictionary<string, string> loginState)
+    {
+        HttpClient httpClient = new();
+        var res = await httpClient.PostAsJsonAsync($"http{Constant.Host}/api/loginer/verifyPass", loginState);
+        if (!res.IsSuccessStatusCode)
+        {
+            httpClient.Dispose();
+            MessageBox.Show("验证失败");
+            return false;
+        }
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody);
+        if (resUtil != null)
+        {
+            if (resUtil.GetValueOrDefault("code").Deserialize<int>() == 200)
+            {
+                httpClient.Dispose();
+                MessageBox.Show("验证成功");
+                return true;
+            }
+            else
+            {
+                var mess = resUtil.GetValueOrDefault("message").Deserialize<string>();
+                if (mess != null && mess != "")
+                {
+                    MessageBox.Show(mess);
+                }
+            }
+        }
+        else
+        {
+            MessageBox.Show("验证失败");
+        }
+        httpClient.Dispose();
+        return false;
+    }
+
+    public new static async Task<string?> GetType(string userId, string password)
+    {
+        HttpClient httpClient = new();
+
+        var res1 = await httpClient.GetAsync($"http{Constant.Host}/api/loginer/getType?userId={userId}&password={password}");
+        if (!res1.IsSuccessStatusCode) { httpClient.Dispose(); return null; }
+        var responseBody = await res1.Content.ReadAsStringAsync();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody);
+        if (resUtil == null) { httpClient.Dispose(); return null; }
+        if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) { httpClient.Dispose(); return null; }
+        var playerType = resUtil.GetValueOrDefault("data").Deserialize<string>();
+        httpClient.Dispose();
+        return playerType;
+    }
+
+    public static async Task SendEliteInfo(string userId, string password, List<int> elites)
+    {
+        HttpClient httpClient = new();
+        var res = await httpClient.PostAsJsonAsync($"http{Constant.Host}/api/loginer/sendElite?userId={userId}&password={password}", elites);
+        if (!res.IsSuccessStatusCode) 
+        {
+            httpClient.Dispose();
+            throw new RequestException("请求失败"); 
+        }
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody);
+        if (resUtil == null) { httpClient.Dispose(); throw new RequestException("请求失败"); }
+        if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) { httpClient.Dispose(); throw new RequestException("请求失败"); }
+        else MessageBox.Show("同步成功");
+        httpClient.Dispose();
+    }
+
+    public static async Task<List<string>?> GetPlayer1Pick(string userId, string password)
+    {
+        HttpClient httpClient = new();
+
+        var res1 = await httpClient.GetAsync($"http{Constant.Host}/api/loginer/getPlayer1PickList?userId={userId}&password={password}");
+        if (!res1.IsSuccessStatusCode) { httpClient.Dispose(); return null; }
+        var responseBody = await res1.Content.ReadAsStringAsync();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody);
+        if (resUtil == null) { httpClient.Dispose(); return null; }
+        if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) { httpClient.Dispose(); return null; }
+        var player1Pick = resUtil.GetValueOrDefault("data").Deserialize<List<string>>();
+        httpClient.Dispose();
+        return player1Pick;
+    }
+
+    public static async Task<List<string>?> GetPlayer2Pick(string userId, string password)
+    {
+        HttpClient httpClient = new();
+
+        var res1 = await httpClient.GetAsync($"http{Constant.Host}/api/loginer/getPlayer2PickList?userId={userId}&password={password}");
+        if (!res1.IsSuccessStatusCode) { httpClient.Dispose(); return null; }
+        var responseBody = await res1.Content.ReadAsStringAsync();
+        var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody);
+        if (resUtil == null) { httpClient.Dispose(); return null; }
+        if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) { httpClient.Dispose(); return null; }
+        var player2Pick = resUtil.GetValueOrDefault("data").Deserialize<List<string>>();
+        httpClient.Dispose();
+        return player2Pick;
+    }
+
     
+
     public static async Task GetAnnouncement()
     {
         HttpClient httpClient = new();
@@ -96,5 +199,6 @@ public static class LoginerApi
                 }
             }
         }
+        httpClient.Dispose();
     }
 }

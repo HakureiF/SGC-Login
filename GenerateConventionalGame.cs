@@ -1,5 +1,6 @@
 ﻿using Seer.api;
 using Seer.DTO;
+using Seer.handler;
 using Seer.Utils;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Seer
 
         private async void GetRaceGroupList()
         {
-            raceGroups = await ConventionalGameApi.GetGroups() ?? new List<RaceGroup>();
+            raceGroups = await ConventionalGameApi.SearchGroups() ?? new List<RaceGroup>();
             Debug.WriteLine(raceGroups.Count);
             RaceGroupList.DataSource = raceGroups;
             RaceGroupList.ValueMember = "groupId";
@@ -61,6 +62,14 @@ namespace Seer
             else
             {
                 MessageBox.Show(@"房间创建失败");
+            }
+        }
+
+        private void CloseGenerate(object? sender, FormClosedEventArgs e)
+        {
+            if (SgcWsHandler._modMark.Equals("Create"))
+            {
+                SgcWsHandler.CloseConnect();
             }
         }
     }

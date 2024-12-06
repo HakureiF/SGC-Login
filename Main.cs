@@ -3,10 +3,12 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Web.WebView2.Core;
 using Seer.api;
+using Seer.handler;
 using Seer.Utils;
 using TouchSocket.Core;
 using TouchSocket.Http.WebSockets;
 using TouchSocket.Sockets;
+using static Seer.DTO.Store;
 
 namespace Seer;
 
@@ -21,10 +23,11 @@ public delegate void EmitFromSubForms(int signal);
 
 public sealed partial class Main : Form
 {
-    public static string? PlayerType;
-    public static int RoomId;
+    public static string? PlayerType { get; set; }
+    public static int RoomId { get; set; }
     //private List<Dictionary<string, int>> bagStore;
-    private int? MiMiId;
+    private int? MiMiId { get; set; }
+    private SgcWsHandler sgcWsHandler { get; set; }
 
     public Main()
     {
@@ -41,7 +44,7 @@ public sealed partial class Main : Form
                 footer.Location = new Point(Location.X, Location.Y + Size.Height);*/
         ShowPeakLogger(null);
         peakLogger.Location = new Point(Location.X + Size.Width, Location.Y);
-        
+        sgcWsHandler = new(new ForwardWsMess(ForwardWsMess), new EmitFromSubForms(EmitFromSubForms));
     }
 
     private async void InitializeAsync()
@@ -124,12 +127,20 @@ public sealed partial class Main : Form
                 string wsMess = "mimiId" + mimiId;
                 if (mess.ContainsKey("signal") && mess.GetValue("signal").Deserialize<string>().Contains("matchVerify"))
                 {
-                    ShowMatchDialog(mimiId);
+                    sgcWsHandler.StartConnect(mimiId, "Match");
                 }
-                else if (Dialog.MyWsClient.Online)
+                if (mess.ContainsKey("signal") && mess.GetValue("signal").Deserialize<string>().Contains("generateGame"))
                 {
-                    Dialog.MyWsClient.SendWithWS(wsMess);
+                    sgcWsHandler.StartConnect(mimiId, "Create");
                 }
+                if (mess.ContainsKey("signal") && mess.GetValue("signal").Deserialize<string>().Contains("joinGame"))
+                {
+                    sgcWsHandler.StartConnect(mimiId, "Join");
+                }
+                //else if (Dialog.MyWsClient.Online)
+                //{
+                //    Dialog.MyWsClient.SendWithWS(wsMess);
+                //}
                 if (bagStore != null)
                 {
                     bagStore.setMimiId(mimiId);
@@ -185,7 +196,12 @@ public sealed partial class Main : Form
                     var ids = mess.GetValue("data").Deserialize<List<int>>();
                     if (ids != null && ids.Count > 0)
                     {
-                        UserInfoApi.SendEliteInfo(ids);
+                        var store = StoreUtil.getStore();
+                        if (store != null)
+                        {
+                            LoginerApi.SendEliteInfo(store.userid, store.passwd, ids);
+                        }
+                        //UserInfoApi.SendEliteInfo(ids);
                     }
                 }
 
@@ -273,14 +289,15 @@ public sealed partial class Main : Form
     }
     public void SendWsMess(string mess)
     { // 发送Ws消息中转
-        if (Dialog.MyWsClient.Online)
-        {
-            Dialog.MyWsClient.SendAsync(mess);
-        }
-        if (Match.MatchWsClient.Online)
-        {
-            Match.SendFromMatchWS(mess);
-        }
+        //if (Dialog.MyWsClient.Online)
+        //{
+        //    Dialog.MyWsClient.SendAsync(mess);
+        //}
+        //if (Match.MatchWsClient.Online)
+        //{
+        //    Match.SendFromMatchWS(mess);
+        //}
+        SgcWsHandler.SendMess(mess);
     }
     public async void ForwardWsMess(string mess)
     { // 接收Ws消息中转
@@ -345,6 +362,19 @@ public sealed partial class Main : Form
                 {
                     peakLogger.petDataEnable = false;
                 }
+                break;
+            case 101:
+
+                ShowMatchDialog();
+                break;
+            case 102:
+                ShowGenerate();
+                break;
+            case 103:
+                ShowJoin();
+                break;
+            case 999:
+                SgcWsHandler.CloseConnect();
                 break;
             default: break;
         }
@@ -458,29 +488,29 @@ public sealed partial class Main : Form
     }
     private void joinRoomButton_Click(object sender, EventArgs e)
     {
-        if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
-        {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
+        //if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
 
-        if (RoomId < 0) return;
+        if (RoomId <= 0) return;
         var mess = JsMessUtil<int>.MessJson("joinRoom", RoomId);
         Debug.WriteLine(mess);
         webView.CoreWebView2.PostWebMessageAsJson(mess);
     }
     private void LoginDialogBtn_Click(object sender, EventArgs e)
     {
-        if (Match.MatchWsClient.Online)
-        {
-            MessageBox.Show(@"匹配对局中无法登录！");
-            return;
-        }
-        if (Dialog.MyWsClient.Online)
-        { //ws还处于连接状态
-            MessageBox.Show(@"您已登录！");
-            return;
-        }
+        //if (Match.MatchWsClient.Online)
+        //{
+        //    MessageBox.Show(@"匹配对局中无法登录！");
+        //    return;
+        //}
+        //if (Dialog.MyWsClient.Online)
+        //{ //ws还处于连接状态
+        //    MessageBox.Show(@"您已登录！");
+        //    return;
+        //}
         var forwardWsMess = new ForwardWsMess(ForwardWsMess);
         var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
         if (dialog is not null)
@@ -507,63 +537,142 @@ public sealed partial class Main : Form
             dialog.Show();
         }
     }
-    private async void GenerateGameButton_Click(object sender, EventArgs e)
+    private void GenerateGameButton_Click(object sender, EventArgs e)
+    {
+        var mess = JsMessUtil<int>.MessJson("getSelfMimiId", 0, "generateGame");
+        webView.CoreWebView2.PostWebMessageAsJson(mess);
+
+        //var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
+        //if (!Dialog.MyWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
+        //if (!await ConventionalGameApi.CheckGameState())
+        //{
+        //    MessageBox.Show(@"处于比赛中！");
+        //    ShowConventionalGame();
+        //    return;
+        //}
+        //if (generateConventionalGame is not null)
+        //{
+        //    if (generateConventionalGame.IsDisposed)
+        //    {
+
+        //        generateConventionalGame = new GenerateConventionalGame(emitFromSubForms)
+        //        {
+        //            StartPosition = FormStartPosition.CenterScreen
+        //        };
+        //        generateConventionalGame.Show();
+        //    }
+        //    else
+        //    {
+        //        generateConventionalGame.Show();
+        //    }
+        //}
+        //else
+        //{
+        //    generateConventionalGame = new GenerateConventionalGame(emitFromSubForms)
+        //    {
+        //        StartPosition = FormStartPosition.CenterScreen
+        //    };
+        //    generateConventionalGame.Show();
+        //}
+    }
+
+    private void ShowGenerate()
     {
         var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
-        if (!Dialog.MyWsClient.Online)
+        Invoke(new EventHandler(delegate
         {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
-        if (!await ConventionalGameApi.CheckGameState())
-        {
-            MessageBox.Show(@"处于比赛中！");
-            ShowConventionalGame();
-            return;
-        }
-        if (generateConventionalGame is not null)
-        {
-            if (generateConventionalGame.IsDisposed)
+            if (generateConventionalGame is not null)
             {
+                if (generateConventionalGame.IsDisposed)
+                {
 
+                    generateConventionalGame = new GenerateConventionalGame(emitFromSubForms)
+                    {
+                        StartPosition = FormStartPosition.CenterScreen
+                    };
+                    generateConventionalGame.Show();
+                }
+                else
+                {
+                    generateConventionalGame.Show();
+                }
+            }
+            else
+            {
                 generateConventionalGame = new GenerateConventionalGame(emitFromSubForms)
                 {
                     StartPosition = FormStartPosition.CenterScreen
                 };
                 generateConventionalGame.Show();
             }
-            else
-            {
-                generateConventionalGame.Show();
-            }
-        }
-        else
-        {
-            generateConventionalGame = new GenerateConventionalGame(emitFromSubForms)
-            {
-                StartPosition = FormStartPosition.CenterScreen
-            };
-            generateConventionalGame.Show();
-        }
-
+        }));
     }
-    private async void JoinGameButton_Click(object sender, EventArgs e)
+
+    private void JoinGameButton_Click(object sender, EventArgs e)
+    {
+        var mess = JsMessUtil<int>.MessJson("getSelfMimiId", 0, "joinGame");
+        webView.CoreWebView2.PostWebMessageAsJson(mess);
+        //var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
+        //if (!Dialog.MyWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
+        //if (!await ConventionalGameApi.CheckGameState())
+        //{
+        //    MessageBox.Show(@"处于比赛中！");
+        //    ShowConventionalGame();
+        //    return;
+        //}
+        //if (joinConventionalGame is not null)
+        //{
+        //    if (joinConventionalGame.IsDisposed)
+        //    {
+        //        joinConventionalGame = new JoinConventionalGame(emitFromSubForms)
+        //        {
+        //            StartPosition = FormStartPosition.CenterScreen
+        //        };
+        //        joinConventionalGame.Show();
+        //    }
+        //    else
+        //    {
+        //        joinConventionalGame.Show();
+        //    }
+        //}
+        //else
+        //{
+        //    joinConventionalGame = new JoinConventionalGame(emitFromSubForms)
+        //    {
+        //        StartPosition = FormStartPosition.CenterScreen
+        //    };
+        //    joinConventionalGame.Show();
+        //}
+    }
+    private void ShowJoin()
     {
         var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
-        if (!Dialog.MyWsClient.Online)
+        Invoke(new EventHandler(delegate
         {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
-        if (!await ConventionalGameApi.CheckGameState())
-        {
-            MessageBox.Show(@"处于比赛中！");
-            ShowConventionalGame();
-            return;
-        }
-        if (joinConventionalGame is not null)
-        {
-            if (joinConventionalGame.IsDisposed)
+            if (joinConventionalGame is not null)
+            {
+                if (joinConventionalGame.IsDisposed)
+                {
+                    joinConventionalGame = new JoinConventionalGame(emitFromSubForms)
+                    {
+                        StartPosition = FormStartPosition.CenterScreen
+                    };
+                    joinConventionalGame.Show();
+                }
+                else
+                {
+                    joinConventionalGame.Show();
+                }
+            }
+            else
             {
                 joinConventionalGame = new JoinConventionalGame(emitFromSubForms)
                 {
@@ -571,20 +680,9 @@ public sealed partial class Main : Form
                 };
                 joinConventionalGame.Show();
             }
-            else
-            {
-                joinConventionalGame.Show();
-            }
-        }
-        else
-        {
-            joinConventionalGame = new JoinConventionalGame(emitFromSubForms)
-            {
-                StartPosition = FormStartPosition.CenterScreen
-            };
-            joinConventionalGame.Show();
-        }
+        }));
     }
+
     private void MenuItem_Mute_Click(object sender, EventArgs e)
     {
         webView.CoreWebView2.IsMuted = webView.CoreWebView2.IsMuted == false;
@@ -667,11 +765,11 @@ public sealed partial class Main : Form
 
     private void RivalMimiToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
-        {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
+        //if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
         var mess = JsMessUtil<int>.MessJson("getRivalMimiId", 0);
         webView.CoreWebView2.PostWebMessageAsJson(mess);
     }
@@ -682,57 +780,61 @@ public sealed partial class Main : Form
         webView.CoreWebView2.PostWebMessageAsJson(mess);
     }
 
-    private void ShowMatchDialog(int seeraccount)
+    private void ShowMatchDialog()
     {
-        if (Dialog.MyWsClient.Online)
-        {
-            MessageBox.Show(@"SGC登录状态下不能匹配！请使用创建对战");
-            return;
-        }
+        //if (Dialog.MyWsClient.Online)
+        //{
+        //    MessageBox.Show(@"SGC登录状态下不能匹配！请使用创建对战");
+        //    return;
+        //}
         var forwardWsMess = new ForwardWsMess(ForwardWsMess);
         var emitFromSubForms = new EmitFromSubForms(EmitFromSubForms);
-        if (match is not null)
+
+        Invoke(new EventHandler(delegate
         {
-            if (match.IsDisposed)
+            if (match is not null)
             {
-                match = new Match(forwardWsMess, emitFromSubForms, seeraccount)
+                if (match.IsDisposed)
                 {
-                    StartPosition = FormStartPosition.CenterScreen
-                };
-                match.Show();
+                    match = new Match(forwardWsMess, emitFromSubForms)
+                    {
+                        StartPosition = FormStartPosition.CenterScreen
+                    };
+                    match.Show();
+                }
+                else
+                {
+                    match.Dispose();
+                    match = new Match(forwardWsMess, emitFromSubForms)
+                    {
+                        StartPosition = FormStartPosition.CenterScreen
+                    };
+                    match.Show();
+                }
             }
             else
             {
-                match.Dispose();
-                match = new Match(forwardWsMess, emitFromSubForms, seeraccount)
+                match = new Match(forwardWsMess, emitFromSubForms)
                 {
                     StartPosition = FormStartPosition.CenterScreen
                 };
                 match.Show();
             }
-        }
-        else
-        {
-            match = new Match(forwardWsMess, emitFromSubForms, seeraccount)
-            {
-                StartPosition = FormStartPosition.CenterScreen
-            };
-            match.Show();
-        }
 
-        var wbvmess = JsMessUtil<int>.MessJson("getSuit", 0, "matchVerify");
-        webView.CoreWebView2.PostWebMessageAsJson(wbvmess);
+            var wbvmess = JsMessUtil<int>.MessJson("getSuit", 0, "matchVerify");
+            webView.CoreWebView2.PostWebMessageAsJson(wbvmess);
+        }));
     }
 
     private void LogoutToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        if (Dialog.MyWsClient.Online)
-        {
-            Dialog.needReconnect = false;
-            Dialog.MyWsClient.Close();
-            Dialog.MyWsClient.Dispose();
-            dialog.Dispose();
-        }
+        //if (Dialog.MyWsClient.Online)
+        //{
+        //    Dialog.needReconnect = false;
+        //    Dialog.MyWsClient.Close();
+        //    Dialog.MyWsClient.Dispose();
+        //    dialog.Dispose();
+        //}
     }
 
     /*    private void RestoreBagMenuItem_Click(object sender, EventArgs e)
@@ -747,11 +849,11 @@ public sealed partial class Main : Form
     private void SendEliteInfoItem_Click(object sender, EventArgs e)
     {
         //MessageBox.Show("程序员赶工中");
-        if (!Dialog.MyWsClient.Online)
-        {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
+        //if (!Dialog.MyWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
         var wbvmess = JsMessUtil<int>.MessJson("getElite", 0);
         SendWebViewMess(wbvmess);
     }
@@ -820,11 +922,11 @@ public sealed partial class Main : Form
         {
             footer.Close();
         }
-        else if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
-        {
-            MessageBox.Show(@"请先登录SGC平台！");
-            return;
-        }
+        //else if (!Dialog.MyWsClient.Online && !Match.MatchWsClient.Online)
+        //{
+        //    MessageBox.Show(@"请先登录SGC平台！");
+        //    return;
+        //}
         else
         {
             ShowFooter();

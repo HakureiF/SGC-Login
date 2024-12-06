@@ -28,7 +28,14 @@ namespace Seer
         private async Task SetPlayer1Pick(bool isNowPlayer)
         {
             //string headUrl = "https://seerh5.61.com/resource/assets/pet/head/";
-            Player1Pick = await GameApi.GetPlayer1Pick();
+            //Player1Pick = await GameApi.GetPlayer1Pick();
+            var store = StoreUtil.getStore();
+            if (store == null)
+            {
+                return;
+            }
+            Debug.WriteLine(store.userid);
+            Player1Pick = await LoginerApi.GetPlayer1Pick(store.userid, store.passwd);
             if (Player1Pick == null) return;
             if (isNowPlayer) //当前登陆器用户是player1
             {
@@ -68,7 +75,13 @@ namespace Seer
         private async Task SetPlayer2Pick(bool isNowPlayer)
         {
             //string headUrl = "https://seerh5.61.com/resource/assets/pet/head/";
-            Player2Pick = await GameApi.GetPlayer2Pick();
+            //Player2Pick = await GameApi.GetPlayer2Pick();
+            var store = StoreUtil.getStore();
+            if (store == null)
+            {
+                return;
+            }
+            Player2Pick = await LoginerApi.GetPlayer2Pick(store.userid, store.passwd);
             if (Player2Pick == null) return;
             if (isNowPlayer) //当前登陆器用户是player2
             {
@@ -107,7 +120,15 @@ namespace Seer
 
         public async void SetPickHeads()
         {
-            var type = await GameApi.GetType();
+            //var type = await GameApi.GetType();
+            var store = StoreUtil.getStore();
+            Debug.WriteLine(store.userid);
+            Debug.WriteLine(store.passwd);
+            if (store == null)
+            {
+                return;
+            }
+            var type = await LoginerApi.GetType(store.userid, store.passwd);
             Debug.WriteLine("set footer heads" + type);
             if (type == "Player1")
             {
@@ -123,7 +144,13 @@ namespace Seer
 
         private async void loadBagButton_Click(object sender, EventArgs e)
         {
-            var type = await GameApi.GetType();
+            //var type = await GameApi.GetType();
+            var store = StoreUtil.getStore();
+            if (store == null)
+            {
+                return;
+            }
+            var type = await LoginerApi.GetType(store.userid, store.passwd);
             if (type != null || Player1Pick != null || Player2Pick != null)
             {
                 var ids = new List<int>();

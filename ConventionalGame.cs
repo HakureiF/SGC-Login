@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using Seer.api;
 using Seer.DTO;
+using Seer.handler;
 using Seer.Utils;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
@@ -164,9 +165,7 @@ namespace Seer
             }
             if (mess.Contains("offLine"))
             {
-                Match.needReconnect = false;
-                Match.MatchWsClient.Close();
-                Match.MatchWsClient.Dispose();
+                SgcWsHandler.CloseConnect();
                 MessageBox.Show("有一方退出或掉线", "掉线", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                 this.Close();
                 this.Dispose();
@@ -175,9 +174,7 @@ namespace Seer
             {
                 var mess2 = JsMessUtil<int>.MessJson("quitRoom", 0);
                 _sendWebViewMess(mess2);
-                Match.needReconnect = false;
-                Match.MatchWsClient.Close();
-                Match.MatchWsClient.Dispose();
+                SgcWsHandler.CloseConnect();
                 this.Close();
                 this.Dispose();
             }
@@ -185,9 +182,7 @@ namespace Seer
             {
                 var mess2 = JsMessUtil<int>.MessJson("shutRoom", 0);
                 _sendWebViewMess(mess2);
-                Match.needReconnect = false;
-                Match.MatchWsClient.Close();
-                Match.MatchWsClient.Dispose();
+                SgcWsHandler.CloseConnect();
                 this.Close();
                 this.Dispose();
             }
@@ -541,7 +536,7 @@ namespace Seer
                 await ConventionalGameApi.SetConventionalSuit(_player2SuitId);
                 await ConventionalGameApi.FreshBag2(player2Pets);
             }
-            _sendWsMess("ready");
+            SgcWsHandler.SendMess("ready");
         }
 
         private async void startButton_Click(object sender, EventArgs e)
@@ -553,7 +548,7 @@ namespace Seer
                 await ConventionalGameApi.SetConventionalSuit(_player1SuitId);
                 await ConventionalGameApi.FreshBag2(player1Pets);
             }
-            _sendWsMess("start");
+            SgcWsHandler.SendMess("start");
         }
 
         private async void exitGameButton_Click(object sender, EventArgs e)
@@ -562,7 +557,6 @@ namespace Seer
             {
                 if (await ConventionalGameApi.ExitGame())
                 {
-                    Match.needReconnect = false;
                     this.Close();
                 }
             }
@@ -587,7 +581,7 @@ namespace Seer
                             label.ForeColor = Color.Blue;
                             label.Text = "首发";
                             player1Pets[petSeq].state = 2;
-                            _sendWsMess("PickElfFirst" + player1Pets[petSeq].id);
+                            SgcWsHandler.SendMess("PickElfFirst" + player1Pets[petSeq].id);
                             pickIncre();
                         }
                     }
@@ -611,7 +605,7 @@ namespace Seer
                                         pickRemain.Add(pet.id);
                                     }
                                 }
-                                _sendWsMess("PickElfRemain" + JsonSerializer.Serialize(pickRemain));
+                                SgcWsHandler.SendMess("PickElfRemain" + JsonSerializer.Serialize(pickRemain));
                             }
                         }
                         if (_pickCount < 5)
@@ -650,7 +644,7 @@ namespace Seer
                                     banids.Add(pet.id);
                                 }
                             }
-                            _sendWsMess("PlayerBan" + JsonSerializer.Serialize(banids));
+                            SgcWsHandler.SendMess("PlayerBan" + JsonSerializer.Serialize(banids));
                         }
                     }
                     if (_banCount < _banNum-1)
@@ -689,7 +683,7 @@ namespace Seer
                             label.ForeColor = Color.Blue;
                             label.Text = "首发";
                             player2Pets[petSeq].state = 2;
-                            _sendWsMess("PickElfFirst" + player2Pets[petSeq].id);
+                            SgcWsHandler.SendMess("PickElfFirst" + player2Pets[petSeq].id);
                             pickIncre();
                         }
                     }
@@ -713,7 +707,7 @@ namespace Seer
                                         pickRemain.Add(pet.id);
                                     }
                                 }
-                                _sendWsMess("PickElfRemain" + JsonSerializer.Serialize(pickRemain));
+                                SgcWsHandler.SendMess("PickElfRemain" + JsonSerializer.Serialize(pickRemain));
                             }
                         }
                         if (_pickCount < 5)
@@ -752,7 +746,7 @@ namespace Seer
                                     banids.Add(pet.id);
                                 }
                             }
-                            _sendWsMess("PlayerBan" + JsonSerializer.Serialize(banids));
+                            SgcWsHandler.SendMess("PlayerBan" + JsonSerializer.Serialize(banids));
                         }
                     }
                     if (_banCount < _banNum-1)
