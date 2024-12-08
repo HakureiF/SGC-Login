@@ -97,59 +97,83 @@ namespace Seer
             switch (_phase)
             {
                 case "WaitingStage":
-                    gameTip.Text = "等待加入";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "等待加入";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = false;
+                    }));
                     _clickAble = false;
                     _sendWebViewMess(mess1);
-                    
                     break;
                 case "PreparationStage":
-                    gameTip.Text = "等待准备";
-                    readyButton.Enabled = isplayer1 ? false : true;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "等待准备";
+                        readyButton.Enabled = isplayer1 ? false : true;
+                        startButton.Enabled = false;
+                    }));
                     _clickAble = false;
                     _sendWebViewMess(mess1);
                     //ReSet();
                     break;
                 case "ReadyStage":
-                    gameTip.Text = isplayer1 ? "对方已准备" : "等待开始";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = isplayer1 ? true : false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = isplayer1 ? "对方已准备" : "等待开始";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = isplayer1 ? true : false;
+                    }));
                     _clickAble = false;
                     _sendWebViewMess(mess1);
                     //ReSet();
                     break;
                 case "PlayerBanElf":
-                    gameTip.Text = "ban精灵";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "ban精灵";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = false;
+                    }));
                     await GetBags();
                     _clickAble = !banOver;
                     break;
                 case "PlayerPickElfFirst":
-                    gameTip.Text = "pick首发";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "pick首发";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = false;
+                    }));
                     await GetBags();
                     _clickAble = !firstOver;
                     break;
                 case "PlayerPickElfRemain":
-                    gameTip.Text = "pick其他";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "pick其他";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = false;
+                    }));
                     await GetBags();
                     _clickAble = !remainOver;
                     break;
                 case "WaitingPeriodResult":
-                    gameTip.Text = "等待结果";
-                    readyButton.Enabled = false;
-                    startButton.Enabled = false;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = "等待结果";
+                        readyButton.Enabled = false;
+                        startButton.Enabled = false;
+                    }));
                     await GetBags();
                     _clickAble = false;
                     break;
                 default:
-                    gameTip.Text = string.Empty; break;
+                    Invoke(new EventHandler(delegate
+                    {
+                        gameTip.Text = string.Empty; 
+                    }));
+                    break;
             }
         }
 
@@ -167,24 +191,36 @@ namespace Seer
             {
                 SgcWsHandler.CloseConnect();
                 MessageBox.Show("有一方退出或掉线", "掉线", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
-                this.Close();
-                this.Dispose();
+                Invoke(new EventHandler(delegate
+                {
+                    if (this is not null)
+                    {
+                        Close();
+                        Dispose();
+                    }
+                }));
             }
             if (mess == "quitRoom")
             {
                 var mess2 = JsMessUtil<int>.MessJson("quitRoom", 0);
                 _sendWebViewMess(mess2);
                 SgcWsHandler.CloseConnect();
-                this.Close();
-                this.Dispose();
+                Invoke(new EventHandler(delegate
+                {
+                    Close();
+                    Dispose();
+                }));
             }
             if (mess.Contains("shutRoom"))
             {
                 var mess2 = JsMessUtil<int>.MessJson("shutRoom", 0);
                 _sendWebViewMess(mess2);
                 SgcWsHandler.CloseConnect();
-                this.Close();
-                this.Dispose();
+                Invoke(new EventHandler(delegate
+                {
+                    Close();
+                    Dispose();
+                }));
             }
 
             if (mess == "BanOver")
@@ -204,8 +240,11 @@ namespace Seer
             }
             else if (mess.Contains("endGame"))
             {
-                this.Close();
-                this.Dispose();
+                Invoke(new EventHandler(delegate
+                {
+                    Close();
+                    Dispose();
+                }));
             }
             else
             {
@@ -354,115 +393,118 @@ namespace Seer
         {
             _pickCount = 0;
             _banCount = 0;
-            foreach (Control c in Controls)
+            Invoke(new EventHandler(delegate
             {
-                if (player1Pets != null && c.Name.StartsWith("player1Pet"))
+                foreach (Control c in Controls)
                 {
-                    var box = (PictureBox)c;
-                    box.ImageLocation = "";
-                    box.Refresh();
-                    int petSeq = int.Parse(box.Name.Substring(10)) - 1;
-                    if (petSeq < player1Pets.Count())
+                    if (player1Pets != null && c.Name.StartsWith("player1Pet"))
                     {
-                        box.ImageLocation = PetUtil.handleHeadUrl(player1Pets[petSeq].id);
+                        var box = (PictureBox)c;
+                        box.ImageLocation = "";
                         box.Refresh();
-                        var label = box.Tag as Label;
-                        switch (player1Pets[petSeq].state)
+                        int petSeq = int.Parse(box.Name.Substring(10)) - 1;
+                        if (petSeq < player1Pets.Count())
                         {
-                            case 0:
-                                label.Text = "";
-                                break;
-                            case 1:
-                                label.ForeColor = Color.Red;
-                                label.Text = "禁用";
-                                if (_type == "Player2")
-                                {
-                                    _banCount++;
-                                    if (_banCount == _banNum)
+                            box.ImageLocation = PetUtil.handleHeadUrl(player1Pets[petSeq].id);
+                            box.Refresh();
+                            var label = box.Tag as Label;
+                            switch (player1Pets[petSeq].state)
+                            {
+                                case 0:
+                                    label.Text = "";
+                                    break;
+                                case 1:
+                                    label.ForeColor = Color.Red;
+                                    label.Text = "禁用";
+                                    if (_type == "Player2")
                                     {
-                                        banOver = true;
+                                        _banCount++;
+                                        if (_banCount == _banNum)
+                                        {
+                                            banOver = true;
+                                        }
                                     }
-                                }
-                                break;
-                            case 2:
-                                label.ForeColor = Color.Blue;
-                                label.Text = "首发";
-                                if (_type == "Player1")
-                                {
-                                    pickIncre();
-                                    firstOver = true;
-                                }
-                                break;
-                            case 3:
-                                label.ForeColor = Color.Blue;
-                                label.Text = "出战";
-                                if (_type == "Player1")
-                                {
-                                    pickIncre();
-                                    if (_pickCount == 6)
+                                    break;
+                                case 2:
+                                    label.ForeColor = Color.Blue;
+                                    label.Text = "首发";
+                                    if (_type == "Player1")
                                     {
-                                        remainOver = true;
+                                        pickIncre();
+                                        firstOver = true;
                                     }
-                                }
-                                break;
-                            default: break;
+                                    break;
+                                case 3:
+                                    label.ForeColor = Color.Blue;
+                                    label.Text = "出战";
+                                    if (_type == "Player1")
+                                    {
+                                        pickIncre();
+                                        if (_pickCount == 6)
+                                        {
+                                            remainOver = true;
+                                        }
+                                    }
+                                    break;
+                                default: break;
+                            }
+                        }
+                    }
+                    if (player2Pets != null && c.Name.StartsWith("player2Pet"))
+                    {
+                        var box = (PictureBox)c;
+                        box.ImageLocation = "";
+                        box.Refresh();
+                        int petSeq = int.Parse(box.Name.Substring(10)) - 1;
+                        if (petSeq < player2Pets.Count())
+                        {
+                            box.ImageLocation = PetUtil.handleHeadUrl(player2Pets[petSeq].id);
+                            box.Refresh();
+                            var label = box.Tag as Label;
+                            switch (player2Pets[petSeq].state)
+                            {
+                                case 0:
+                                    label.Text = "";
+                                    break;
+                                case 1:
+                                    label.ForeColor = Color.Red;
+                                    label.Text = "禁用";
+                                    if (_type == "Player1")
+                                    {
+                                        _banCount++;
+                                        if (_banCount == _banNum)
+                                        {
+                                            banOver = true;
+                                        }
+                                    }
+                                    break;
+                                case 2:
+                                    label.ForeColor = Color.Blue;
+                                    label.Text = "首发";
+                                    if (_type == "Player2")
+                                    {
+                                        pickIncre();
+                                        firstOver = true;
+                                    }
+                                    break;
+                                case 3:
+                                    label.ForeColor = Color.Blue;
+                                    label.Text = "出战";
+                                    if (_type == "Player2")
+                                    {
+                                        pickIncre();
+                                        if (_pickCount == 6)
+                                        {
+                                            remainOver = true;
+                                        }
+                                    }
+                                    break;
+                                default: break;
+                            }
                         }
                     }
                 }
-                if (player2Pets != null && c.Name.StartsWith("player2Pet"))
-                {
-                    var box = (PictureBox)c;
-                    box.ImageLocation = "";
-                    box.Refresh();
-                    int petSeq = int.Parse(box.Name.Substring(10)) - 1;
-                    if (petSeq < player2Pets.Count())
-                    {
-                        box.ImageLocation = PetUtil.handleHeadUrl(player2Pets[petSeq].id);
-                        box.Refresh();
-                        var label = box.Tag as Label;
-                        switch (player2Pets[petSeq].state)
-                        {
-                            case 0:
-                                label.Text = "";
-                                break;
-                            case 1:
-                                label.ForeColor = Color.Red;
-                                label.Text = "禁用";
-                                if (_type == "Player1")
-                                {
-                                    _banCount++;
-                                    if (_banCount == _banNum)
-                                    {
-                                        banOver = true;
-                                    }
-                                }
-                                break;
-                            case 2:
-                                label.ForeColor = Color.Blue;
-                                label.Text = "首发";
-                                if (_type == "Player2")
-                                {
-                                    pickIncre();
-                                    firstOver = true;
-                                }
-                                break;
-                            case 3:
-                                label.ForeColor = Color.Blue;
-                                label.Text = "出战";
-                                if (_type == "Player2")
-                                {
-                                    pickIncre();
-                                    if (_pickCount == 6)
-                                    {
-                                        remainOver = true;
-                                    }
-                                }
-                                break;
-                            default: break;
-                        }
-                    }
-                }
-            }
+            }));
         }
 
         private async Task InitSuit()
@@ -557,7 +599,8 @@ namespace Seer
             {
                 if (await ConventionalGameApi.ExitGame())
                 {
-                    this.Close();
+                    SgcWsHandler.CloseConnect();
+                    Close();
                 }
             }
         }

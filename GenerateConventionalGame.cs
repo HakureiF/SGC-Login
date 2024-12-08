@@ -53,9 +53,10 @@ namespace Seer
             var gameId = game != null ? game.GetValueOrDefault("gameId") : "";
             //var code = game != null ? game.GetValueOrDefault("code") : "";
 
-            Clipboard.SetDataObject($"对战号为：{gameId}");
+            Clipboard.SetDataObject($"{gameId}");
             if (game != null)
             {
+                SgcWsHandler._modMark = "";
                 _emitFromSubForms(3);
                 Close();
             }

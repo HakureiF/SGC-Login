@@ -34,6 +34,7 @@ namespace Seer
             bool succ = await ConventionalGameApi.JoinConventionalGame(param);
             if (succ)
             {
+                SgcWsHandler._modMark = "";
                 _emitFromSubForms(3);
                 Close();
             }

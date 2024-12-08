@@ -19,7 +19,7 @@ namespace Seer.handler
         public static WebSocketClient WsClient { get; set; } = new();
         public static bool _online { get; set; } = false;
         public static int _seerAccount { get; set; }
-        public static string _modMark { get; set; }
+        public static string _modMark { get; set; } = "";
         
 
         public SgcWsHandler(ForwardWsMess forwardWsMess, EmitFromSubForms emitFromSubForms)
@@ -81,6 +81,7 @@ namespace Seer.handler
                         else if (e.ToText() == "onMatch")
                         {
                             _emitFromSubForms(3);
+                            _emitFromSubForms(5);
                             _forwardWsMess(e.ToText());
                         }
                         else if (e.ToText() == "PlayerBanned")

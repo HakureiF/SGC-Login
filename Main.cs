@@ -345,6 +345,16 @@ public sealed partial class Main : Form
                                 SendWebViewMess(wbvmess);
                             }
                             break;*/
+            case 5:
+                Invoke(new EventHandler(delegate
+                {
+                    if (match is not null)
+                    {
+                        match.Close();
+                        match.Dispose();
+                    }
+                }));
+                break;
             case 6: //掉线不重连，关闭12ban3界面
                 if (conventionalGame != null && conventionalGame.Visible == true)
                 {
@@ -721,16 +731,22 @@ public sealed partial class Main : Form
         {
             if (peakLogger.IsDisposed)
             {
-                peakLogger = new PeakLogger();
-                peakLogger.Show();
-                peakLogger.Location = new Point(Location.X + Size.Width, Location.Y);
-                if (ids != null) peakLogger.SetRivalPetHeads(ids);
+                Invoke(new EventHandler(delegate
+                {
+                    peakLogger = new PeakLogger();
+                    peakLogger.Show();
+                    peakLogger.Location = new Point(Location.X + Size.Width, Location.Y);
+                    if (ids != null) peakLogger.SetRivalPetHeads(ids);
+                }));
             }
             else
             {
-                peakLogger.Show();
-                peakLogger.Location = new Point(Location.X + Size.Width, Location.Y);
-                if (ids != null) peakLogger.SetRivalPetHeads(ids);
+                Invoke(new EventHandler(delegate
+                {
+                    peakLogger.Show();
+                    peakLogger.Location = new Point(Location.X + Size.Width, Location.Y);
+                    if (ids != null) peakLogger.SetRivalPetHeads(ids);
+                }));
             }
         }
         else

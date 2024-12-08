@@ -8,12 +8,12 @@ namespace Seer.Utils;
 public class Constant
 {
     //public static string Host = "://localhost:8080";
-    public static string Host = "s://ww2.hakureif.site:8080";
+    public static string Host { get; set; } = "s://www.imrightchen.live";
 
     //public static string MatchHost = "://localhost:8080";
-    public static string MatchHost = "s://www.hakureif.site:8080";
+    public static string MatchHost { get; set; } = "s://www.hakureif.site:8080";
 
-    public static string _version = "1.1.7";
+    public static string _version = "1.2.1";
 
     
 
