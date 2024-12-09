@@ -110,6 +110,7 @@ namespace Seer.handler
                         }
                         if (e.ToText().Contains("endGame"))
                         {
+                            WsClient.Close();
                             _emitFromSubForms(8);
                         }
                     }
