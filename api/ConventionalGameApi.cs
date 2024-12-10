@@ -1,15 +1,8 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using Seer.DTO;
+﻿using Seer.DTO;
 using Seer.Utils;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Seer.api;
 
@@ -30,7 +23,7 @@ public static class ConventionalGameApi
     public static async Task<List<RaceGroup>?> GetGroups()
     {
         var httpClient = HttpClientInterceptor.Get_HttpClient();
-        
+
         var res1 = await httpClient.GetAsync("/api/race-group/groups");
         if (!res1.IsSuccessStatusCode) throw new Exception("链接失败");
         var responseBody = await res1.Content.ReadAsStringAsync();
@@ -131,6 +124,7 @@ public static class ConventionalGameApi
         var resUtil = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseBody) ?? throw new Exception("链接失败");
         if (resUtil.GetValueOrDefault("code").Deserialize<int>() != 200) return null;
         var suit = resUtil.GetValueOrDefault("data").Deserialize<Dictionary<string, string>>();
+        Debug.WriteLine(JsonSerializer.Serialize(suit));
         return suit;
     }
 
@@ -146,7 +140,7 @@ public static class ConventionalGameApi
         var mess = resUtil.GetValueOrDefault("message").Deserialize<string>();
         if (mess != null)
         {
-            MessageBox.Show(mess); 
+            MessageBox.Show(mess);
         }
         return false;
     }

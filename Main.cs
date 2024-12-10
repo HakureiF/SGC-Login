@@ -469,6 +469,8 @@ public sealed partial class Main : Form
         webView.CoreWebView2.ExecuteScriptAsync(JsScript.WebViewListener);
         webView.CoreWebView2.ExecuteScriptAsync(JsScript.LoginListener);
         EmitFromSubForms(8);
+        SgcWsHandler.CloseConnect();
+        SgcWsHandler._modMark = "";
     }
     /*private async void MovePetsToBag(object sender, EventArgs e)
     {
@@ -884,6 +886,8 @@ public sealed partial class Main : Form
         else
         {
             ConventionalGameApi.RemoveGameCache(MiMiId);
+            SgcWsHandler.CloseConnect();
+            SgcWsHandler._modMark = "";
         }
     }
 

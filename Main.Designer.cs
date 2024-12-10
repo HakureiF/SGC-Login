@@ -39,7 +39,6 @@ namespace Seer
             MenuItem_Mute = new ToolStripMenuItem();
             MenuItem_Login = new ToolStripMenuItem();
             LoginToolStripMenuItem = new ToolStripMenuItem();
-            LogoutToolStripMenuItem = new ToolStripMenuItem();
             SGCToolStripMenuItem = new ToolStripMenuItem();
             SendEliteInfoItem = new ToolStripMenuItem();
             ShowpickToolStripMenuItem = new ToolStripMenuItem();
@@ -61,10 +60,7 @@ namespace Seer
             // webView
             // 
             webView.AllowExternalDrop = true;
-/*            webView.CreationProperties = new CoreWebView2CreationProperties
-            {
-                AdditionalBrowserArguments = "--disable-gpu"
-            };*/
+            webView.CreationProperties = null;
             webView.DefaultBackgroundColor = Color.White;
             webView.ImeMode = ImeMode.Off;
             webView.Location = new Point(0, 28);
@@ -100,7 +96,7 @@ namespace Seer
             // 
             // MenuItem_Login
             // 
-            MenuItem_Login.DropDownItems.AddRange(new ToolStripItem[] { LoginToolStripMenuItem, LogoutToolStripMenuItem });
+            MenuItem_Login.DropDownItems.AddRange(new ToolStripItem[] { LoginToolStripMenuItem });
             MenuItem_Login.Name = "MenuItem_Login";
             MenuItem_Login.Size = new Size(68, 21);
             MenuItem_Login.Text = "登录SGC";
@@ -111,13 +107,6 @@ namespace Seer
             LoginToolStripMenuItem.Size = new Size(180, 22);
             LoginToolStripMenuItem.Text = "登录";
             LoginToolStripMenuItem.Click += LoginDialogBtn_Click;
-            // 
-            // LogoutToolStripMenuItem
-            // 
-            LogoutToolStripMenuItem.Name = "LogoutToolStripMenuItem";
-            LogoutToolStripMenuItem.Size = new Size(180, 22);
-            LogoutToolStripMenuItem.Text = "登出";
-            LogoutToolStripMenuItem.Click += LogoutToolStripMenuItem_Click;
             // 
             // SGCToolStripMenuItem
             // 
@@ -179,35 +168,35 @@ namespace Seer
             // 
             LoginerFunctuin.DropDownItems.AddRange(new ToolStripItem[] { MenuItem_GenerateConventionalGame, MenuItem_JoinConventionalGame, MatchToolStripMenuItem, RemoveCacheItem });
             LoginerFunctuin.Name = "LoginerFunctuin";
-            LoginerFunctuin.Size = new Size(87, 21);
+            LoginerFunctuin.Size = new Size(90, 21);
             LoginerFunctuin.Text = "12banN模式";
             // 
             // MenuItem_GenerateConventionalGame
             // 
             MenuItem_GenerateConventionalGame.Name = "MenuItem_GenerateConventionalGame";
-            MenuItem_GenerateConventionalGame.Size = new Size(192, 22);
-            MenuItem_GenerateConventionalGame.Text = "新建对战(需登录SGC)";
+            MenuItem_GenerateConventionalGame.Size = new Size(180, 22);
+            MenuItem_GenerateConventionalGame.Text = "新建对战";
             MenuItem_GenerateConventionalGame.Click += GenerateGameButton_Click;
             // 
             // MenuItem_JoinConventionalGame
             // 
             MenuItem_JoinConventionalGame.Name = "MenuItem_JoinConventionalGame";
-            MenuItem_JoinConventionalGame.Size = new Size(192, 22);
-            MenuItem_JoinConventionalGame.Text = "加入对战(需登录SGC)";
+            MenuItem_JoinConventionalGame.Size = new Size(180, 22);
+            MenuItem_JoinConventionalGame.Text = "加入对战";
             MenuItem_JoinConventionalGame.Click += JoinGameButton_Click;
             // 
             // MatchToolStripMenuItem
             // 
             MatchToolStripMenuItem.Name = "MatchToolStripMenuItem";
-            MatchToolStripMenuItem.Size = new Size(192, 22);
+            MatchToolStripMenuItem.Size = new Size(180, 22);
             MatchToolStripMenuItem.Text = "匹配对局";
             MatchToolStripMenuItem.Click += MatchToolStripMenuItem_Click;
             // 
             // RemoveCacheItem
             // 
             RemoveCacheItem.Name = "RemoveCacheItem";
-            RemoveCacheItem.Size = new Size(192, 22);
-            RemoveCacheItem.Text = "清除匹配数据";
+            RemoveCacheItem.Size = new Size(180, 22);
+            RemoveCacheItem.Text = "清除对局数据";
             RemoveCacheItem.Click += RemoveCacheItem_Click;
             // 
             // TestToolStripMenuItem
@@ -264,7 +253,6 @@ namespace Seer
         private ToolStripMenuItem RivalMimiToolStripMenuItem;
         private ToolStripMenuItem MatchToolStripMenuItem;
         private ToolStripMenuItem LoginToolStripMenuItem;
-        private ToolStripMenuItem LogoutToolStripMenuItem;
         private ToolStripMenuItem TestToolStripMenuItem;
         private ToolStripMenuItem SendEliteInfoItem;
         private ToolStripMenuItem RemoveCacheItem;

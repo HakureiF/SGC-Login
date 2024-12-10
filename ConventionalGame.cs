@@ -107,12 +107,13 @@ namespace Seer
                     _sendWebViewMess(mess1);
                     break;
                 case "PreparationStage":
-                    Invoke(new EventHandler(delegate
-                    {
-                        gameTip.Text = "等待准备";
-                        readyButton.Enabled = isplayer1 ? false : true;
-                        startButton.Enabled = false;
-                    }));
+                    gameTip.Text = "等待准备";
+                    readyButton.Enabled = isplayer1 ? false : true;
+                    startButton.Enabled = false;
+                    //Invoke(new EventHandler(delegate
+                    //{
+                        
+                    //}));
                     _clickAble = false;
                     _sendWebViewMess(mess1);
                     //ReSet();
@@ -513,29 +514,19 @@ namespace Seer
 
             //获取双方方套装
             var suit = await ConventionalGameApi.GetPickSuit();
-            if (_phase != "WaitingStage" && _phase != "PreparationStage" && _phase != "ReadyStage")
+            if (suit != null)
             {
-                if (_type != null && _type.Equals("Player1"))
+                if (!suit.GetValueOrDefault("Player1PickSuit").IsNullOrEmpty())
                 {
-                    //player2Suit.ImageLocation = "";
-                    if (suit.GetValueOrDefault("Player2PickSuit").Length > 1)
-                    {
-                        _player2SuitId = suit.GetValueOrDefault("Player2PickSuit");
-                        player2Suit.ImageLocation = suitUrl + _player2SuitId + @".png";
-                        player2Suit.Refresh();
-                    }
-                    Debug.WriteLine("Player2PickSuit:" + suit.GetValueOrDefault("Player2PickSuit"));
+                    _player1SuitId = suit.GetValueOrDefault("Player1PickSuit");
+                    player1Suit.ImageLocation = suitUrl + _player1SuitId + @".png";
+                    player1Suit.Refresh();
                 }
-                else if (_type != null && _type.Equals("Player2"))
+                if (!suit.GetValueOrDefault("Player2PickSuit").IsNullOrEmpty())
                 {
-                    //player1Suit.ImageLocation = "";
-                    if (suit.GetValueOrDefault("Player1PickSuit").Length > 1)
-                    {
-                        _player1SuitId = suit.GetValueOrDefault("Player1PickSuit");
-                        player1Suit.ImageLocation = suitUrl + _player1SuitId + @".png";
-                        player1Suit.Refresh();
-                    }
-                    Debug.WriteLine("Player1PickSuit:" + suit.GetValueOrDefault("Player1PickSuit"));
+                    _player2SuitId = suit.GetValueOrDefault("Player2PickSuit");
+                    player2Suit.ImageLocation = suitUrl + _player2SuitId + @".png";
+                    player2Suit.Refresh();
                 }
             }
 
