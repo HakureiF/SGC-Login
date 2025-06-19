@@ -17,7 +17,8 @@ namespace Seer.DTO
         public Skill? hideSkill { get; set; }
         public int state { get; set; }
         public List<Mark>? bindMarks { get; set; }
-        
+        public int skinId { get; set; }
+
 
 
         public class Skill

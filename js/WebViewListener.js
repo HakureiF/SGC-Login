@@ -35,7 +35,10 @@ async function addToBag(data) {
         }
     }
 }
-
+/**
+ * 根据catchTime更换背包
+ * @param {*} data 
+ */
 async function addToBagFull(data) {
     let i;
 
@@ -172,7 +175,9 @@ function getBag(webviewData) {
             marks: [firstBagDetail[firstBagkeys[i]].skillMark, firstBagDetail[firstBagkeys[i]].abilityMark, firstBagDetail[firstBagkeys[i]].commonMark],
             skillArray: firstBagDetail[firstBagkeys[i]].skillArray,
             hideSKill: firstBagDetail[firstBagkeys[i]].hideSKill,
-            state: 0
+            state: 0,
+            bindMarks: CountermarkController.getPetBindMarks({'id': firstBagDetail[firstBagkeys[i]].id}),
+            skinId: firstBagDetail[firstBagkeys[i]]._skinId
         })
         ids.push(firstBagDetail[firstBagkeys[i]].id)
     }
@@ -188,7 +193,9 @@ function getBag(webviewData) {
             marks: [secondBagDetail[secondBagkeys[i]].skillMark, secondBagDetail[secondBagkeys[i]].abilityMark, secondBagDetail[secondBagkeys[i]].commonMark],
             skillArray: secondBagDetail[secondBagkeys[i]].skillArray,
             hideSKill: secondBagDetail[secondBagkeys[i]].hideSKill,
-            state: 0
+            state: 0,
+            bindMarks: CountermarkController.getPetBindMarks({'id': secondBagDetail[secondBagkeys[i]].id}),
+            skinId: secondBagDetail[secondBagkeys[i]]._skinId
         })
         ids.push(secondBagDetail[secondBagkeys[i]].id)
     }

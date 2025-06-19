@@ -86,7 +86,7 @@ function listenPetChange(t) {
             window.chrome.webview.postMessage(JSON.stringify(mess));
             rivalAliveNum = FightUserInfo.fighterInfos.otherInfo.aliveNum
         }
-        unit8 = new Uint8Array(t._data.data.buffer.slice(4, 8)) 
+        unit8 = new Uint8Array(t._data.data.buffer.slice(4, 8))
         var petId = unit8[2] * 256 + unit8[3] //对方切上来的精灵
         rivalPetNow = petId
         var mess = { type: 'loggerPetId', data: petId };
@@ -110,6 +110,9 @@ function readRoomId(t) {
 }
 //轮询登录状态
 function pollingLogin() {
+    if (!GuideManager) {
+        return
+    }
     console.log("isLogin:", GuideManager.isCompleted())
     if (GuideManager.isCompleted()) {
 

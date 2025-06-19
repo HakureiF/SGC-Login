@@ -52,7 +52,8 @@ namespace Seer.Utils
             }
             else if (id > 5000)
             {
-                return HeadSGC + id_str + ".png";
+                int temp = id / 10;
+                return HeadTaomee + temp.ToString() + ".png";
             }
             return HeadTaomee + id_str + ".png";
         }
